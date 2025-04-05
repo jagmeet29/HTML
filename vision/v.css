@@ -1,0 +1,50 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background-image: url("../v4.png");
+  background-size: cover;
+  background-position: center;
+}
+h1 {
+  font-family: "Fleur De Leah", cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: xxx-large;
+  color: rgb(0, 0, 0);
+
+  text-align: center;
+  transition: all 2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  transform: translateY(0);
+}
+.hero {
+  height: 100%;
+  width: 100%;
+  background-color: rgb(255, 255, 255);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  transition: all 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+.hero.scrolled {
+  height: 80px;
+  background-color: rgba(255, 255, 255, 0);
+  filter: blur(1);
+}
+.hero.scrolled h1 {
+  background-color: rgba(255, 255, 255, 0);
+  color: #ffffff;
+}
+.content {
+  margin-top: 100vh;
+  min-height: 100vh;
+  position: relative;
+
+  z-index: 1;
+}
