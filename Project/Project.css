@@ -1,0 +1,93 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#container {
+  background-color: #fe9b7e;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+#logo {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#container h1 {
+  color: white;
+  font-family: "Luckiest Guy", cursive;
+  font-weight: 400;
+  font-style: normal;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-size: 30px;
+}
+#rabb {
+  padding: 0px 70px;
+}
+
+#searchdiv {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+#search {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 15px;
+  border-radius: 7px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+}
+
+#searchbtn {
+  padding: 12px 25px;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+  background-color: #ff6f61;
+  color: white;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+#searchbtn:hover {
+  background-color: #e65a50;
+}
+#loginbtn {
+  padding: 12px 25px;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  background-color: #87a658;
+  color: white;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+#maintext {
+  padding: 100px 0px;
+  text-align: center;
+}
+#maintext h1 {
+  font-size: 50px;
+
+  color: #4b3d2e;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  transform: r;
+}
+.luckiest-guy-regular {
+  font-family: "Luckiest Guy", cursive;
+  font-weight: 400;
+  font-style: normal;
+}

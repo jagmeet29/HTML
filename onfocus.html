@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        background-color: #f2f0d8;
+      }
+      div {
+        text-align: left;
+        padding: 15px 30px;
+      }
+    </style>
+    <script>
+      function myblure(element) {
+        element.style.background = "white";
+        element.value = element.value.toUpperCase();
+      }
+      function myfocus(element) {
+        element.style.background = "yellow";
+      }
+      function myin() {
+        var x = document.getElementById("frame").value;
+        document.getElementById("para").innerHTML = "You wrote 😊 " + x;
+      }
+      function mydown() {
+        document.getElementById("aler").innerHTML = "You have pressed a key!";
+      }
+      function ticke() {
+        document.getElementById("tickle").innerHTML = "You tickled me! 🤗😍";
+      }
+      function tickeleave() {
+        document.getElementById("tickle").innerHTML = "You are going 😭 ";
+      }
+    </script>
+  </head>
+  <body>
+    <div>
+      Write somthing
+      <input
+        type="text"
+        id="frame"
+        onblur="myblure(this)"
+        onfocus="myfocus(this)"
+        oninput="myin()"
+        onkeydown="mydown()"
+      />
+    </div>
+
+    <p>Come on --- write something 😊</p>
+    <p id="aler"></p>
+    <h1 id="tickle" onmouseenter="ticke()" onmouseleave="tickeleave()">
+      Tickle Me !!!!
+    </h1>
+  </body>
+</html>

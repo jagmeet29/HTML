@@ -1,0 +1,19 @@
+.this {
+  background-color: red;
+  color: white;
+}
+* {
+  color: #ffa500;
+}
+div > h1 {
+  text-shadow: 2px 2px 2px #aa8237;
+}
+a[href="www.google.com"] {
+  color: #ff0000;
+}
+div {
+  background-image: url("m.jpg");
+  background-size: cover; /* or contain, depending on your needs */
+  background-repeat: no-repeat;
+  background-position: center;
+}

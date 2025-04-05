@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Infinity Notes</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.5/purify.min.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <button id="new-note">New Note</button>
+      <input type="text" id="search" placeholder="Search notes..." />
+      <div id="notes-container"></div>
+    </div>
+
+    <script>
+      class InfinityNotes {
+        constructor() {
+          this.notes = [];
+          this.init();
+          this.setupEventListeners();
+          this.loadNotes();
+        }
+
+        init() {
+          this.container = document.getElementById("app");
+          this.notesContainer = document.getElementById("notes-container");
+        }
+        setupEventListeners() {
+          document.getElementById("new-note").addEventListener("click", () => {
+            this.createNote();
+          });
+
+          document.getElementById("search").addEventListener("input", (e) => {
+            this.searchNotes(e.target.value);
+          });
+        }
+
+        createNote(content = "", x = 100, y = 100) {
+          const note = {
+            id: Date.now(),
+            content,
+            x,
+            y,
+            width: 250,
+            height: 150,
+          };
+
+          this.notes.push(note);
+          this.renderNote(note);
+          this.saveNotes();
+        }
+        renderNote(note) {
+          const [mdContent, cssContent] = note.content.split("---css---");
+          const noteEl = document.createElement("div");
+          noteEl.className = "note";
+          noteEl.dataset.id = note.id;
+          noteEl.style.position = "absolute";
+          noteEl.style.width = `${note.width}px`;
+          noteEl.style.height = `${note.height}px`;
+          noteEl.style.left = `${note.x}px`;
+          noteEl.style.top = `${note.y}px`;
+          noteEl.style.border = "1px solid black";
+          noteEl.style.padding = "10px";
+          noteEl.style.backgroundColor = "#f0f0f0";
+
+          const safeMarkdown = DOMPurify.sanitize(
+            marked.parse(mdContent || "")
+          );
+
+          noteEl.innerHTML = `
+            <div class="note-header">
+            <span>📝 Note</span>
+            <button onclick="app.deleteNote(${note.id})">×</button>
+            </div>
+                <div class="note-content">
+            <div class="preview">${safeMarkdown}</div>
+            <textarea class="editor" style="width: 100%; height: 100px;">${mdContent}</textarea>
+            <textarea class="css-editor" style="width: 100%; height: 50px;">${
+              cssContent || ""
+            }</textarea>
+            </div>
+                <div class="resize-handle" style="cursor: se-resize; position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #000;"></div>
+            `;
+
+          const textarea = noteEl.querySelector(".editor");
+          const preview = noteEl.querySelector(".preview");
+
+          textarea.addEventListener("input", (e) => {
+            const [newMd] = e.target.value.split("---css---");
+            preview.innerHTML = DOMPurify.sanitize(marked.parse(newMd));
+            note.content =
+              e.target.value + (cssContent ? `---css---${cssContent}` : "");
+            this.saveNotes();
+          });
+
+          const cssEditor = noteEl.querySelector(".css-editor");
+          cssEditor.addEventListener("input", (e) => {
+            note.content = `${mdContent}---css---${e.target.value}`;
+            this.saveNotes();
+          });
+
+          const resizeHandle = noteEl.querySelector(".resize-handle");
+          this.makeResizable(noteEl, resizeHandle, note);
+          this.notesContainer.appendChild(noteEl);
+        }
+
+        saveNotes() {
+          localStorage.setItem("infinity-notes", JSON.stringify(this.notes));
+        }
+
+        loadNotes() {
+          const saved = localStorage.getItem("infinity-notes");
+          if (saved) {
+            this.notes = JSON.parse(saved);
+            this.notes.forEach((note) => this.renderNote(note));
+          }
+        }
+
+        // We'll add more methods here
+      }
+
+      // Initialize app
+      const app = new InfinityNotes();
+    </script>
+  </body>
+</html>

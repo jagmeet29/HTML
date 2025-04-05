@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script>
+      function myfun() {
+        var x = document.getElementById("myselect").value;
+        document.getElementById("change").innerHTML = "You selected " + x;
+      }
+    </script>
+  </head>
+  <body>
+    <h1>On select</h1>
+    <select id="myselect" onchange="myfun()">
+      <option value="Audio">Audio</option>
+      <option value="Video">Video</option>
+      <option value="Both">Both</option>
+    </select>
+    <p id="change">selected NON</p>
+  </body>
+</html>

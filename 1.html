@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Advanced Markdown Example</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 0 20px;
+      }
+
+      pre {
+        background-color: #f6f8fa;
+        padding: 16px;
+        border-radius: 6px;
+        overflow-x: auto;
+      }
+
+      code {
+        font-family: "Courier New", Courier, monospace;
+      }
+
+      .task-list-item {
+        list-style-type: none;
+        margin-left: -20px;
+      }
+
+      .task-list-item input {
+        margin-right: 10px;
+      }
+
+      h1,
+      h2 {
+        border-bottom: 1px solid #eaecef;
+        padding-bottom: 0.3em;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="content">
+      <h1>Advanced Markdown</h1>
+
+      <h2>Code Syntax Highlighting</h2>
+
+      <p>Python code:</p>
+      <pre><code class="language-python">def fibonacci(n):
+    if n <= 1:
+        return n
+    else:
+        return fibonacci(n-1) + fibonacci(n-2)
+</code></pre>
+
+      <h2>Task Lists</h2>
+
+      <ul class="task-list">
+        <li class="task-list-item">
+          <input type="checkbox" checked disabled /> Completed task
+        </li>
+        <li class="task-list-item">
+          <input type="checkbox" disabled /> Pending task
+        </li>
+      </ul>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css"
+    />
+  </body>
+</html>

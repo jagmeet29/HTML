@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=width=device-width, initial-scale=1.0"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fleur+De+Leah&display=swap"
+      rel="stylesheet"
+    />
+    <title>My Mood Board</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        min-height: 100vh;
+        overflow-x: hidden;
+        background-image: url("v5.png");
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 100% auto;
+      }
+      .color-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(194, 0, 133, 0.293);
+        opacity: 0.3;
+        z-index: -1;
+      }
+      .content {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        padding-bottom: 50px;
+      }
+      h1 {
+        color: white;
+        text-align: center;
+        padding: 20px;
+      }
+      .mood-board {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        padding: 20px;
+      }
+      .mood-item {
+        position: absolute;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s;
+      }
+      .mood-item:hover {
+        transform: scale(1.05);
+      }
+      .mood-item img {
+        max-width: 200px;
+        border-radius: 10px;
+      }
+      .mood-item.text {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        max-width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="background-color: rgb(0, 0, 0)">
+      <h1
+        style="
+          font-family: 'Fleur De Leah', cursive;
+          font-weight: 400;
+          font-style: normal;
+          font-size: xxx-large;
+        "
+      >
+        Vision
+      </h1>
+    </div>
+    <div class="color-overlay"></div>
+    <div class="content">
+      <div class="mood-board">
+        <div class="mood-item" style="top: 520px; left: 100px">
+          <img src="https://picsum.photos/200/300" alt="Inspiration 1" />
+        </div>
+        <div class="mood-item text" style="top: 180px; left: 350px">
+          <p>Dream big, work hard</p>
+        </div>
+        <div class="mood-item" style="top: 250px; left: 600px">
+          <img src="https://picsum.photos/200/200" alt="Inspiration 2" />
+        </div>
+        <div class="mood-item text" style="top: 400px; left: 200px">
+          <p>Make it happen</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
