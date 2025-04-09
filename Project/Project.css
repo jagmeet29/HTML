@@ -84,10 +84,158 @@
 
   color: #4b3d2e;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  transform: r;
 }
 .luckiest-guy-regular {
   font-family: "Luckiest Guy", cursive;
   font-weight: 400;
   font-style: normal;
+}
+
+#coupons-section {
+  padding: 40px 20px;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+}
+
+.coupon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.coupon {
+  display: flex;
+  width: 100%;
+  color: white;
+  font-family: Arial, sans-serif;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.coupon:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.coupon.maroon {
+  background-color: #8b0047;
+}
+
+.coupon.teal {
+  background-color: #16a085;
+}
+
+.coupon-content {
+  padding: 20px;
+  flex-grow: 1;
+  border-right: 2px dashed rgba(255, 255, 255, 0.5);
+  position: relative;
+}
+
+.coupon-content h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.coupon-content p {
+  margin: 5px 0;
+  font-size: 0.9em;
+}
+
+.coupon-content strong {
+  font-weight: bold;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8em;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.coupon:hover .copy-btn {
+  opacity: 1;
+  visibility: visible;
+}
+
+.copy-btn:hover {
+  background-color: white;
+}
+
+.coupon-discount {
+  background-color: rgba(0, 0, 0, 0.1);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  font-size: 2em;
+  font-weight: bold;
+
+  min-width: 60px;
+  position: relative;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.coupon-discount span {
+  transform: rotate(180deg);
+  display: inline-block;
+}
+
+.cut-line {
+  width: 100%;
+  text-align: right;
+  color: #555;
+  font-size: 1.5em;
+  line-height: 1;
+  margin: 5px 0;
+  border-bottom: 2px dashed #aaa;
+  position: relative;
+}
+
+.scissors {
+  position: absolute;
+  right: 0;
+  top: -15px;
+  background-color: #f0f0f0;
+  padding: 0 5px;
+}
+
+/* Media Query for wider screens */
+@media (min-width: 768px) {
+  .coupon-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* Align items to the start */
+    max-width: 1100px;
+    gap: 20px;
+  }
+
+  .coupon {
+    width: calc(50% - 10px);
+    min-width: 400px;
+  }
+
+  .cut-line {
+    display: none;
+  }
 }
