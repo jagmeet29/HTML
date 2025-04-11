@@ -3,551 +3,152 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>D3.js Zoomable Circle Packing</title>
+    <title>D3.js Visualization Toggle</title>
+    <!-- Include the D3 library -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Include our separated JavaScript files -->
+    <script src="data.js"></script>
+    <script src="circlePacking.js"></script>
+    <script src="tree.js"></script>
+    <!-- CSS Styles -->
     <style>
+      /* Basic body styling */
       body {
-        margin: 0;
-        overflow: hidden; /* Prevent scrollbars during transition */
+        margin: 0; /* Remove default body margin */
+        overflow: hidden; /* Prevent scrollbars, especially during transitions */
+        font-family: sans-serif; /* Set a default font */
       }
+      /* Style for the toggle button */
       #toggleBtn {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
-        padding: 10px;
-        cursor: pointer;
+        position: fixed; /* Keep button in a fixed position on screen */
+        top: 20px; /* Position from the top */
+        right: 20px; /* Position from the right */
+        z-index: 1000; /* Ensure button is above the SVG charts */
+        padding: 10px; /* Add some padding inside the button */
+        cursor: pointer; /* Change cursor to indicate it's clickable */
+        background-color: #eee; /* Light grey background */
+        border: 1px solid #ccc; /* Simple border */
+        border-radius: 4px; /* Slightly rounded corners */
       }
+      /* Style for the container div that holds the charts */
       #container {
-        display: flex; /* Use flexbox for centering */
-        justify-content: center; /* Center horizontally */
-        align-items: center; /* Center vertically */
-        width: 100vw;
+        display: flex; /* Use flexbox layout */
+        justify-content: center; /* Center content horizontally */
+        align-items: center; /* Center content vertically */
+        width: 100vw; /* Full viewport width */
         height: 100vh; /* Full viewport height */
-        position: relative; /* Keep for layering during transition */
+        position: relative; /* Needed for absolute positioning of SVGs during transition */
+        overflow-x: auto; /* Allow horizontal scrolling */
+        overflow-y: hidden; /* Keep vertical overflow hidden */
       }
-      /* Ensure SVGs don't exceed container */
+      /* Style rule for SVG elements within the container */
       #container svg {
-        max-width: 100%;
-        max-height: 100%;
+        max-height: 100%; /* Prevent SVG from exceeding container height */
+        display: block; /* Needed when not using flex centering directly on SVG */
+        margin: 0 auto; /* Center horizontally if container is wider */
       }
     </style>
   </head>
   <body>
+    <!-- The button to switch between chart types -->
     <button id="toggleBtn">Toggle View</button>
+    <!-- The div where the charts will be displayed -->
     <div id="container"></div>
+
+    <!-- Main script for controlling the toggle logic -->
     <script>
-      // Sample hierarchical data (replace with your actual data)
-      const data = {
-        name: "root",
-        children: [
-          {
-            name: "Multiple Access",
-            children: [
-              {
-                name: "Ranmdom Access",
-                children: [
-                  { name: "Pure ALOHA", value: 5 },
-                  { name: "Sloted ALOHA", value: 5 },
-                  { name: "Carrier Sence Multiple Access", value: 5 },
-                ],
-              },
-              { name: "Control Access", value: 10 },
-            ],
-          },
-        ],
-      };
+      // --- State Variable ---
+      // This variable keeps track of which chart is currently displayed.
+      // It can be 'circle' or 'tree'.
+      let currentView = "circle"; // Start with circle view
 
-      let currentView = "circle"; // Track current visualization ('circle', 'tree', 'sunburst')
-
-      // Function to create circle packing visualization
-      function createCirclePacking() {
-        const width = window.innerWidth * 0.9; // Use 90% of window width
-        const height = window.innerHeight * 0.9; // Use 90% of window height
-        const size = Math.min(width, height); // Use the smaller dimension for square packing
-
-        const color = d3
-          .scaleLinear()
-          .domain([0, 5])
-          .range(["#FFFFFF", "#F01111", "#0000"])
-          .interpolate(d3.interpolateRgb);
-
-        const pack = (data) =>
-          d3.pack().size([size, size]).padding(5)(
-            d3
-              .hierarchy(data)
-              .sum((d) => d.value)
-              .sort((a, b) => b.value - a.value)
-          );
-        const root = pack(data);
-
-        const svg = d3
-          .create("svg")
-          .attr("viewBox", `-${size / 2} -${size / 2} ${size} ${size}`)
-          .attr("width", size)
-          .attr("height", size)
-          .attr(
-            "style",
-            `display: block; 
-             margin: auto; 
-             background: ${color(0)}; 
-             cursor: pointer;`
-          );
-
-        const node = svg
-          .append("g")
-          .selectAll("circle")
-          .data(root.descendants().slice(1))
-          .join("circle")
-          .attr("fill", (d) => (d.children ? color(d.depth) : "white"))
-          .attr("pointer-events", (d) => (!d.children ? "none" : null))
-          .on("mouseover", function () {
-            d3.select(this).attr("stroke", "#000");
-          })
-          .on("mouseout", function () {
-            d3.select(this).attr("stroke", null);
-          })
-          .on(
-            "click",
-            (event, d) =>
-              focus !== d && (zoom(event, d), event.stopPropagation())
-          );
-
-        const label = svg
-          .append("g")
-          .style("font", "10px sans-serif")
-          .attr("pointer-events", "none")
-          .attr("text-anchor", "middle")
-          .selectAll("text")
-          .data(root.descendants())
-          .join("text")
-          .style("fill-opacity", (d) => (d.parent === root ? 1 : 0))
-          .style("display", (d) => (d.parent === root ? "inline" : "none"))
-          .text((d) => d.data.name);
-
-        svg.on("click", (event) => zoom(event, root));
-        let focus = root;
-        let view;
-        zoomTo([focus.x, focus.y, focus.r * 2]);
-
-        function zoomTo(v) {
-          const k = size / v[2];
-          view = v;
-          label.attr(
-            "transform",
-            (d) => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`
-          );
-          node.attr(
-            "transform",
-            (d) => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`
-          );
-          node.attr("r", (d) => d.r * k);
-        }
-
-        function zoom(event, d) {
-          focus = d;
-
-          const transition = svg
-            .transition()
-            .duration(event.altKey ? 7500 : 1200)
-            .ease(d3.easeCubicInOut)
-            .tween("zoom", (d) => {
-              const i = d3.interpolateZoom(view, [
-                focus.x,
-                focus.y,
-                focus.r * 2,
-              ]);
-              return (t) => zoomTo(i(t));
-            });
-
-          label
-            .filter(function (d) {
-              return d.parent === focus || this.style.display === "inline";
-            })
-            .transition(transition)
-            .ease(d3.easeCubicInOut)
-            .style("fill-opacity", (d) => (d.parent === focus ? 1 : 0))
-            .on("start", function (d) {
-              if (d.parent === focus) this.style.display = "inline";
-            })
-            .on("end", function (d) {
-              if (d.parent !== focus) this.style.display = "none";
-            });
-        }
-
-        return svg.node();
-      }
-
-      // Function to create tree visualization
-      function createTree() {
-        const width = window.innerWidth * 0.9;
-        const marginTop = 30;
-        const marginRight = 150;
-        const marginBottom = 30;
-        const marginLeft = 100;
-
-        const root = d3.hierarchy(data);
-        root.x0 = 0;
-        root.y0 = 0;
-        root.descendants().forEach((d, i) => {
-          d.id = i;
-          d._children = d.children;
-        });
-
-        const dx = 35;
-        const dy = (width - marginRight - marginLeft) / (1 + root.height);
-
-        const tree = d3.tree().nodeSize([dx, dy]);
-        const diagonal = d3
-          .linkHorizontal()
-          .x((d) => d.y)
-          .y((d) => d.x);
-
-        const svg = d3
-          .create("svg")
-          .attr("width", width)
-          .attr("height", dx)
-          .attr("viewBox", [-marginLeft, -marginTop, width, dx])
-          .attr(
-            "style",
-            "max-width: 100%; height: 90vh; font: 14px sans-serif; user-select: none;"
-          );
-
-        const gLink = svg
-          .append("g")
-          .attr("fill", "none")
-          .attr("stroke", "#555")
-          .attr("stroke-opacity", 0.4)
-          .attr("stroke-width", 1.5);
-
-        const gNode = svg
-          .append("g")
-          .attr("cursor", "pointer")
-          .attr("pointer-events", "all");
-
-        function update(source) {
-          const duration = 250;
-          const nodes = root.descendants();
-          const links = root.links();
-
-          tree(root);
-
-          let left = root;
-          let right = root;
-          root.eachBefore((node) => {
-            if (node.x < left.x) left = node;
-            if (node.x > right.x) right = node;
-          });
-          const calculatedHeight = right.x - left.x + marginTop + marginBottom;
-          const height = Math.max(window.innerHeight * 0.8, calculatedHeight);
-
-          const transition = svg
-            .transition()
-            .duration(duration)
-            .attr("height", height)
-            .attr("viewBox", [-marginLeft, left.x - marginTop, width, height])
-            .tween(
-              "resize",
-              window.ResizeObserver ? null : () => () => svg.dispatch("toggle")
-            );
-
-          const node = gNode.selectAll("g").data(nodes, (d) => d.id);
-
-          const nodeEnter = node
-            .enter()
-            .append("g")
-            .attr("transform", (d) => `translate(${source.y0},${source.x0})`)
-            .attr("fill-opacity", 0)
-            .attr("stroke-opacity", 0)
-            .on("click", (event, d) => {
-              d.children = d.children ? null : d._children;
-              update(d);
-            });
-
-          nodeEnter
-            .append("circle")
-            .attr("r", 6)
-            .attr("fill", (d) => (d._children ? "#555" : "#999"))
-            .attr("stroke-width", 1);
-
-          nodeEnter
-            .append("text")
-            .attr("dy", "0.31em")
-            .attr("x", (d) => (d._children ? -10 : 10))
-            .attr("text-anchor", (d) => (d._children ? "end" : "start"))
-            .text((d) => d.data.name)
-            .clone(true)
-            .lower()
-            .attr("stroke-linejoin", "round")
-            .attr("stroke-width", 3)
-            .attr("stroke", "white");
-
-          node
-            .merge(nodeEnter)
-            .transition(transition)
-            .attr("transform", (d) => `translate(${d.y},${d.x})`)
-            .attr("fill-opacity", 1)
-            .attr("stroke-opacity", 1);
-
-          const nodeExit = node
-            .exit()
-            .transition(transition)
-            .remove()
-            .attr("transform", (d) => `translate(${source.y},${source.x})`)
-            .attr("fill-opacity", 0)
-            .attr("stroke-opacity", 0);
-
-          const link = gLink.selectAll("path").data(links, (d) => d.target.id);
-
-          const linkEnter = link
-            .enter()
-            .append("path")
-            .attr("d", (d) => {
-              const o = { x: source.x0, y: source.y0 };
-              return diagonal({ source: o, target: o });
-            });
-
-          link.merge(linkEnter).transition(transition).attr("d", diagonal);
-
-          link
-            .exit()
-            .transition(transition)
-            .remove()
-            .attr("d", (d) => {
-              const o = { x: source.x, y: source.y };
-              return diagonal({ source: o, target: o });
-            });
-
-          root.eachBefore((d) => {
-            d.x0 = d.x;
-            d.y0 = d.y;
-          });
-        }
-
-        update(root);
-        return svg.node();
-      }
-
-      // Function to create sunburst visualization
-      function createSunburst() {
-        const width = window.innerWidth * 0.9;
-        const height = width;
-        const radius = Math.min(width, window.innerHeight * 0.9) / 6;
-
-        const color = d3.scaleOrdinal(
-          d3.quantize(d3.interpolateRainbow, data.children.length + 1)
-        );
-
-        const hierarchy = d3
-          .hierarchy(data)
-          .sum((d) => d.value)
-          .sort((a, b) => b.value - a.value);
-        const root = d3.partition().size([2 * Math.PI, hierarchy.height + 1])(
-          hierarchy
-        );
-        root.each((d) => (d.current = d));
-
-        const arc = d3
-          .arc()
-          .startAngle((d) => d.x0)
-          .endAngle((d) => d.x1)
-          .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.005))
-          .padRadius(radius * 1.5)
-          .innerRadius((d) => d.y0 * radius)
-          .outerRadius((d) => Math.max(d.y0 * radius, d.y1 * radius - 1));
-
-        const svg = d3
-          .create("svg")
-          .attr("viewBox", [-width / 2, -height / 2, width, width])
-          .attr("width", width)
-          .attr("height", height)
-          .style("font", "10px sans-serif")
-          .style("max-width", "100%")
-          .style("height", "auto");
-
-        const path = svg
-          .append("g")
-          .selectAll("path")
-          .data(root.descendants().slice(1))
-          .join("path")
-          .attr("fill", (d) => {
-            while (d.depth > 1) d = d.parent;
-            return color(d.data.name);
-          })
-          .attr("fill-opacity", (d) =>
-            arcVisible(d.current) ? (d.children ? 0.6 : 0.4) : 0
-          )
-          .attr("pointer-events", (d) =>
-            arcVisible(d.current) ? "auto" : "none"
-          )
-          .attr("d", (d) => arc(d.current));
-
-        path
-          .filter((d) => d.children)
-          .style("cursor", "pointer")
-          .on("click", clicked);
-
-        const format = d3.format(",d");
-        path.append("title").text(
-          (d) =>
-            `${d
-              .ancestors()
-              .map((d) => d.data.name)
-              .reverse()
-              .join("/")}\n${format(d.value)}`
-        );
-
-        const label = svg
-          .append("g")
-          .attr("pointer-events", "none")
-          .attr("text-anchor", "middle")
-          .style("user-select", "none")
-          .selectAll("text")
-          .data(root.descendants().slice(1))
-          .join("text")
-          .attr("dy", "0.35em")
-          .attr("fill-opacity", (d) => +labelVisible(d.current))
-          .attr("transform", (d) => labelTransform(d.current))
-          .text((d) => d.data.name);
-
-        const parent = svg
-          .append("circle")
-          .datum(root)
-          .attr("r", radius)
-          .attr("fill", "none")
-          .attr("pointer-events", "all")
-          .on("click", clicked);
-
-        function clicked(event, p) {
-          parent.datum(p.parent || root);
-
-          root.each((d) => {
-            d.target = {
-              x0:
-                Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) *
-                2 *
-                Math.PI,
-              x1:
-                Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) *
-                2 *
-                Math.PI,
-              y0: Math.max(0, d.y0 - p.depth),
-              y1: Math.max(0, d.y1 - p.depth),
-            };
-          });
-
-          const t = svg
-            .transition()
-            .duration(event.altKey ? 7500 : 750)
-            .ease(d3.easeCubicInOut); // Added easing
-
-          path
-            .transition(t)
-            .tween("data", (d) => {
-              const i = d3.interpolate(d.current, d.target);
-              return (t) => (d.current = i(t));
-            })
-            .filter(function (d) {
-              return +this.getAttribute("fill-opacity") || arcVisible(d.target);
-            })
-            .attr("fill-opacity", (d) =>
-              arcVisible(d.target) ? (d.children ? 0.6 : 0.4) : 0
-            )
-            .attr("pointer-events", (d) =>
-              arcVisible(d.target) ? "auto" : "none"
-            )
-            .attrTween("d", (d) => () => arc(d.current));
-
-          label
-            .filter(function (d) {
-              return (
-                +this.getAttribute("fill-opacity") || labelVisible(d.target)
-              );
-            })
-            .transition(t)
-            .attr("fill-opacity", (d) => +labelVisible(d.target))
-            .attrTween("transform", (d) => () => labelTransform(d.current));
-        }
-
-        function arcVisible(d) {
-          return d.y1 <= 3 && d.y0 >= 1 && d.x1 > d.x0;
-        }
-
-        function labelVisible(d) {
-          return d.y1 <= 3 && d.y0 >= 1 && (d.y1 - d.y0) * (d.x1 - d.x0) > 0.03;
-        }
-
-        function labelTransform(d) {
-          const x = (((d.x0 + d.x1) / 2) * 180) / Math.PI;
-          const y = ((d.y0 + d.y1) / 2) * radius;
-          return `rotate(${x - 90}) translate(${y},0) rotate(${
-            x < 180 ? 0 : 180
-          })`;
-        }
-
-        return svg.node();
-      }
-
-      // Function to toggle between visualizations with smooth transition
+      // --- Toggle Function ---
+      // This function is called when the "Toggle View" button is clicked.
+      // It handles the smooth transition between different chart types.
       function toggleView() {
+        // Select the container div using D3.
         const container = d3.select("#container");
-        const duration = 750; // Increased duration for smoother feel
+        // Define the duration for the fade-in/fade-out animation (in milliseconds).
+        const duration = 1000; // Increased duration for smoother view transition
 
+        // Find the SVG element currently displayed inside the container (if any).
         const oldSvg = container.select("svg");
 
-        let nextViewCreator;
+        // --- Determine Next Chart ---
+        // Decide which chart creation function to call next based on the currentView.
+        let nextViewCreator; // This will hold the function reference (e.g., createTree).
         if (currentView === "circle") {
+          // If currently showing 'circle', the next one is 'tree'.
           nextViewCreator = createTree;
-          currentView = "tree";
-        } else if (currentView === "tree") {
-          nextViewCreator = createSunburst;
-          currentView = "sunburst";
+          currentView = "tree"; // Update the state variable.
         } else {
+          // currentView must be "tree"
+          // If currently showing 'tree', loop back to 'circle'.
           nextViewCreator = createCirclePacking;
-          currentView = "circle";
+          currentView = "circle"; // Update the state variable.
         }
 
+        // --- Create New Chart ---
+        // Call the chosen function (e.g., createTree()) to generate the new SVG DOM node.
         const newSvgNode = nextViewCreator();
+        // If the creation function failed for some reason, stop here.
         if (!newSvgNode) return;
 
+        // --- Prepare New SVG for Transition ---
+        // Select the newly created SVG node using D3 to apply styles and transitions.
         const newSvg = d3
           .select(newSvgNode)
+          // Start the new SVG completely transparent.
           .style("opacity", 0)
-          .style("position", "absolute") // Keep absolute for transition overlap
-          .style("top", 0) // Ensure it overlaps correctly
+          // Position it absolutely to layer it on top of the old one during the transition.
+          .style("position", "absolute")
+          // Align the top-left corner with the container's top-left.
+          .style("top", 0)
           .style("left", 0);
 
+        // --- Add New SVG to Page ---
+        // Append the new (still invisible) SVG node to the container div.
         container.node().appendChild(newSvgNode);
 
+        // --- Fade Out Old SVG ---
+        // Check if there was an old SVG to remove.
         if (!oldSvg.empty()) {
+          // Start a transition on the old SVG.
           oldSvg
             .transition()
-            .duration(duration)
-            .ease(d3.easeCubicInOut) // Add easing
-            .style("opacity", 0)
-            .remove();
+            .duration(duration) // Apply increased duration
+            .ease(d3.easeCubicInOut) // Use easing for smoothness.
+            .style("opacity", 0) // Animate opacity to 0 (fade out).
+            .remove(); // Remove the old SVG element from the DOM after the transition completes.
         }
 
+        // --- Fade In New SVG ---
+        // Start a transition on the new SVG.
         newSvg
           .transition()
-          .duration(duration)
-          .ease(d3.easeCubicInOut) // Add easing
-          .style("opacity", 1)
+          .duration(duration) // Apply increased duration
+          .ease(d3.easeCubicInOut) // Use easing for smoothness.
+          .style("opacity", 1) // Animate opacity to 1 (fade in).
+          // Define what happens when the fade-in transition ends.
           .on("end", function () {
-            // Use 'function' for 'this'
-            // Remove absolute positioning AFTER fade-in to allow flex centering
+            // Use 'function' to access 'this' (the new SVG).
+            // Remove the absolute positioning. This allows the container's
+            // flexbox styles to center the SVG correctly now that the old one is gone.
             d3.select(this).style("position", null);
           });
-      }
+      } // End of toggleView function
 
-      // Initial render (no transition needed)
+      // --- Initial Setup ---
+      // When the page first loads, create and display the initial chart (Circle Packing).
+      // We directly append it without a transition.
       document.getElementById("container").appendChild(createCirclePacking());
 
-      // Add click handler to toggle button
+      // --- Event Listener ---
+      // Find the button element by its ID.
+      // Add a click event listener that calls the toggleView function when the button is clicked.
       document
         .getElementById("toggleBtn")
         .addEventListener("click", toggleView);
     </script>
   </body>
 </html>
-```
