@@ -266,8 +266,14 @@ function createTree() {
 
           // Update the original data structure
           if (findAndUpdateNode(data)) {
-            // Save the updated data to localStorage
-            saveData(data);
+            // Save data to file through server
+            fetch("/saveData", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            });
 
             // Store expanded/collapsed state
             const expandedNodes = new Set();
