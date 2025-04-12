@@ -220,12 +220,20 @@
   padding: 0 5px;
 }
 
+<<<<<<< HEAD
 
+=======
+/* Media Query for wider screens */
+>>>>>>> 088a7217646cdedfc0ad1e2aea2752519194e0f8
 @media (min-width: 768px) {
   .coupon-container {
     flex-direction: row;
     flex-wrap: wrap;
+<<<<<<< HEAD
     justify-content: flex-start; 
+=======
+    justify-content: flex-start; /* Align items to the start */
+>>>>>>> 088a7217646cdedfc0ad1e2aea2752519194e0f8
     max-width: 1100px;
     gap: 20px;
   }
